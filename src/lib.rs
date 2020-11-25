@@ -63,8 +63,8 @@ where
 }
 
 /// A common interface to wait for a Task completion, let it run n the background or cancel it.
-#[async_trait]
-pub trait Task<T: 'static>: Future<Output = T> {
+#[async_trait(?Send)]
+pub trait Task<T>: Future<Output = T> {
     /// Let the task run in the background, discarding its return value
     fn detach(self);
     /// Cancels the task and waits for it to stop running.
