@@ -15,7 +15,10 @@ pub trait Executor {
     ///
     /// Dropping the handle will cancel the future. You can call `detach()` to let it
     /// run without waiting for its completion.
-    fn spawn<T: Send + 'static>(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>>;
+    fn spawn<T: Send + 'static>(
+        &self,
+        f: Pin<Box<dyn Future<Output = T> + Send>>,
+    ) -> Box<dyn Task<T>>;
 }
 
 /// A common interface for spawning non-Send futures on top of an executor, on the current thread
@@ -31,14 +34,18 @@ pub trait LocalExecutor {
 #[async_trait]
 pub trait BlockingExecutor {
     /// Convert a blocking task into a future, spawning it on a decicated thread pool
-    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(&self, f: F) -> T;
+    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(&self, f: F)
+        -> T;
 }
 
 impl<E: Deref> Executor for E
 where
     E::Target: Executor,
 {
-    fn spawn<T: Send + 'static>(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>> {
+    fn spawn<T: Send + 'static>(
+        &self,
+        f: Pin<Box<dyn Future<Output = T> + Send>>,
+    ) -> Box<dyn Task<T>> {
         self.deref().spawn(f)
     }
 }
@@ -57,7 +64,10 @@ impl<E: Deref + Sync> BlockingExecutor for E
 where
     E::Target: BlockingExecutor + Sync,
 {
-    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(&self, f: F) -> T {
+    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(
+        &self,
+        f: F,
+    ) -> T {
         self.deref().spawn_blocking(f).await
     }
 }
