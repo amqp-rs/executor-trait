@@ -9,7 +9,8 @@ use alloc::boxed::Box;
 use async_trait::async_trait;
 use core::{future::Future, ops::Deref, pin::Pin};
 
-/// A common interface for spawning futures on top of an executor
+/// A common interface for spawning futures and blocking tasks on top of an executor
+#[async_trait]
 pub trait Executor {
     /// Spawn a future and return a handle to get its result on completion.
     ///
@@ -19,28 +20,22 @@ pub trait Executor {
         &self,
         f: Pin<Box<dyn Future<Output = T> + Send>>,
     ) -> Box<dyn Task<T>>;
-}
 
-/// A common interface for spawning non-Send futures on top of an executor, on the current thread
-pub trait LocalExecutor {
     /// Spawn a non-Send future on the current thread and return a handle to get its result on completion.
     ///
     /// Dropping the handle will cancel the future. You can call `detach()` to let it
     /// run without waiting for its completion.
     fn spawn_local<T: 'static>(&self, f: Pin<Box<dyn Future<Output = T>>>) -> Box<dyn Task<T>>;
-}
 
-/// A common interface for spawning blocking tasks on top of an executor
-#[async_trait]
-pub trait BlockingExecutor {
     /// Convert a blocking task into a future, spawning it on a decicated thread pool
     async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(&self, f: F)
         -> T;
 }
 
-impl<E: Deref> Executor for E
+#[async_trait]
+impl<E: Deref + Sync> Executor for E
 where
-    E::Target: Executor,
+    E::Target: Executor + Sync,
 {
     fn spawn<T: Send + 'static>(
         &self,
@@ -48,22 +43,11 @@ where
     ) -> Box<dyn Task<T>> {
         self.deref().spawn(f)
     }
-}
 
-impl<E: Deref> LocalExecutor for E
-where
-    E::Target: LocalExecutor,
-{
     fn spawn_local<T: 'static>(&self, f: Pin<Box<dyn Future<Output = T>>>) -> Box<dyn Task<T>> {
         self.deref().spawn_local(f)
     }
-}
 
-#[async_trait]
-impl<E: Deref + Sync> BlockingExecutor for E
-where
-    E::Target: BlockingExecutor + Sync,
-{
     async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(
         &self,
         f: F,
@@ -77,6 +61,7 @@ where
 pub trait Task<T>: Future<Output = T> {
     /// Let the task run in the background, discarding its return value
     fn detach(self);
+
     /// Cancels the task and waits for it to stop running.
     ///
     /// Returns the task's output if it was completed just before it got canceled, or None if it
