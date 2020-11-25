@@ -9,6 +9,10 @@ pub trait Executor {
     fn spawn<T>(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>>;
 }
 
+pub trait LocalExecutor {
+    fn spawn_local<T>(&self, f: Pin<Box<dyn Future<Output = T>>>) -> Box<dyn Task<T>>;
+}
+
 pub trait BlockingExecutor {
     fn spawn_blocking<T>(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>>;
 }
@@ -19,6 +23,15 @@ where
 {
     fn spawn<T>(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>> {
         self.deref().spawn(f)
+    }
+}
+
+impl<E: Deref> LocalExecutor for E
+where
+    E::Target: LocalExecutor,
+{
+    fn spawn_local<T>(&self, f: Pin<Box<dyn Future<Output = T>>>) -> Box<dyn Task<T>> {
+        self.deref().spawn_local(f)
     }
 }
 
