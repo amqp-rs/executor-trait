@@ -2,22 +2,29 @@
 extern crate alloc;
 
 use alloc::boxed::Box;
+use async_trait::async_trait;
 use core::{future::Future, ops::Deref, pin::Pin};
 
-pub trait Executor {
-    fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>);
-    fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send>);
+pub trait Executor<T> {
+    fn spawn(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>>;
+    fn spawn_blocking(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>>;
 }
 
-impl<E: Deref> Executor for E
+impl<T, E: Deref> Executor<T> for E
 where
-    E::Target: Executor,
+    E::Target: Executor<T>,
 {
-    fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) {
-        self.deref().spawn(f);
+    fn spawn(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>> {
+        self.deref().spawn(f)
     }
 
-    fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send>) {
+    fn spawn_blocking(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>> {
         self.deref().spawn_blocking(f)
     }
+}
+
+#[async_trait]
+pub trait Task<T>: Future<Output = T> {
+    fn detach(self);
+    async fn cancel(self) -> Option<T>;
 }
