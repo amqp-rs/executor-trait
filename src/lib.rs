@@ -7,6 +7,9 @@ use core::{future::Future, ops::Deref, pin::Pin};
 
 pub trait Executor<T> {
     fn spawn(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>>;
+}
+
+pub trait BlockingExecutor<T> {
     fn spawn_blocking(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>>;
 }
 
@@ -17,7 +20,12 @@ where
     fn spawn(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>> {
         self.deref().spawn(f)
     }
+}
 
+impl<T, E: Deref> BlockingExecutor<T> for E
+where
+    E::Target: BlockingExecutor<T>,
+{
     fn spawn_blocking(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>> {
         self.deref().spawn_blocking(f)
     }
