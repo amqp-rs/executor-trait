@@ -5,28 +5,28 @@ use alloc::boxed::Box;
 use async_trait::async_trait;
 use core::{future::Future, ops::Deref, pin::Pin};
 
-pub trait Executor<T> {
-    fn spawn(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>>;
+pub trait Executor {
+    fn spawn<T>(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>>;
 }
 
-pub trait BlockingExecutor<T> {
-    fn spawn_blocking(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>>;
+pub trait BlockingExecutor {
+    fn spawn_blocking<T>(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>>;
 }
 
-impl<T, E: Deref> Executor<T> for E
+impl<E: Deref> Executor for E
 where
-    E::Target: Executor<T>,
+    E::Target: Executor,
 {
-    fn spawn(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>> {
+    fn spawn<T>(&self, f: Pin<Box<dyn Future<Output = T> + Send>>) -> Box<dyn Task<T>> {
         self.deref().spawn(f)
     }
 }
 
-impl<T, E: Deref> BlockingExecutor<T> for E
+impl<E: Deref> BlockingExecutor for E
 where
-    E::Target: BlockingExecutor<T>,
+    E::Target: BlockingExecutor,
 {
-    fn spawn_blocking(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>> {
+    fn spawn_blocking<T>(&self, f: Box<dyn FnOnce() -> T + Send>) -> Box<dyn Task<T>> {
         self.deref().spawn_blocking(f)
     }
 }
