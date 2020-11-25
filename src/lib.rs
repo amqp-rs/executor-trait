@@ -31,7 +31,7 @@ pub trait LocalExecutor {
 #[async_trait]
 pub trait BlockingExecutor {
     /// Convert a blocking task into a future, spawning it on a decicated thread pool
-    async fn spawn_blocking<T: Send + 'static>(&self, f: Box<dyn FnOnce() -> T + Send>) -> T;
+    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(&self, f: F) -> T;
 }
 
 impl<E: Deref> Executor for E
@@ -57,7 +57,7 @@ impl<E: Deref + Sync> BlockingExecutor for E
 where
     E::Target: BlockingExecutor + Sync,
 {
-    async fn spawn_blocking<T: Send + 'static>(&self, f: Box<dyn FnOnce() -> T + Send>) -> T {
+    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(&self, f: F) -> T {
         self.deref().spawn_blocking(f).await
     }
 }
