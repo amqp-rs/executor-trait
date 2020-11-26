@@ -12,13 +12,13 @@ use core::{future::Future, ops::Deref, pin::Pin};
 /// A common interface for spawning futures and blocking tasks on top of an executor
 #[async_trait]
 pub trait Executor {
-    /// Spawn a future and return a handle to get its result on completion.
+    /// Spawn a future and return a handle to track its completion.
     ///
     /// Dropping the handle will cancel the future. You can call `detach()` to let it
     /// run without waiting for its completion.
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task>;
 
-    /// Spawn a non-Send future on the current thread and return a handle to get its result on completion.
+    /// Spawn a non-Send future on the current thread and return a handle to track its completion.
     ///
     /// Dropping the handle will cancel the future. You can call `detach()` to let it
     /// run without waiting for its completion.
@@ -49,7 +49,7 @@ where
 /// A common interface to wait for a Task completion, let it run n the background or cancel it.
 #[async_trait(?Send)]
 pub trait Task: Future<Output = ()> {
-    /// Let the task run in the background, discarding its return value
+    /// Let the task run in the background.
     fn detach(self);
 
     /// Cancels the task and waits for it to stop running.
