@@ -16,20 +16,16 @@ pub trait Executor {
     ///
     /// Dropping the handle will cancel the future. You can call `detach()` to let it
     /// run without waiting for its completion.
-    fn spawn<T: Send + 'static>(
-        &self,
-        f: Pin<Box<dyn Future<Output = T> + Send>>,
-    ) -> Box<dyn Task<T>>;
+    fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task>;
 
     /// Spawn a non-Send future on the current thread and return a handle to get its result on completion.
     ///
     /// Dropping the handle will cancel the future. You can call `detach()` to let it
     /// run without waiting for its completion.
-    fn spawn_local<T: 'static>(&self, f: Pin<Box<dyn Future<Output = T>>>) -> Box<dyn Task<T>>;
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task>;
 
     /// Convert a blocking task into a future, spawning it on a decicated thread pool
-    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(&self, f: F)
-        -> T;
+    async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>);
 }
 
 #[async_trait]
@@ -37,28 +33,22 @@ impl<E: Deref + Sync> Executor for E
 where
     E::Target: Executor + Sync,
 {
-    fn spawn<T: Send + 'static>(
-        &self,
-        f: Pin<Box<dyn Future<Output = T> + Send>>,
-    ) -> Box<dyn Task<T>> {
+    fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
         self.deref().spawn(f)
     }
 
-    fn spawn_local<T: 'static>(&self, f: Pin<Box<dyn Future<Output = T>>>) -> Box<dyn Task<T>> {
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
         self.deref().spawn_local(f)
     }
 
-    async fn spawn_blocking<F: FnOnce() -> T + Send + 'static, T: Send + 'static>(
-        &self,
-        f: F,
-    ) -> T {
+    async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         self.deref().spawn_blocking(f).await
     }
 }
 
 /// A common interface to wait for a Task completion, let it run n the background or cancel it.
 #[async_trait(?Send)]
-pub trait Task<T>: Future<Output = T> {
+pub trait Task: Future<Output = ()> {
     /// Let the task run in the background, discarding its return value
     fn detach(self);
 
@@ -66,5 +56,5 @@ pub trait Task<T>: Future<Output = T> {
     ///
     /// Returns the task's output if it was completed just before it got canceled, or None if it
     /// didn't complete.
-    async fn cancel(self) -> Option<T>;
+    async fn cancel(self) -> Option<()>;
 }
