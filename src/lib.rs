@@ -50,11 +50,11 @@ where
 #[async_trait(?Send)]
 pub trait Task: Future<Output = ()> {
     /// Let the task run in the background.
-    fn detach(self);
+    fn detach(self: Box<Self>);
 
     /// Cancels the task and waits for it to stop running.
     ///
     /// Returns the task's output if it was completed just before it got canceled, or None if it
     /// didn't complete.
-    async fn cancel(self) -> Option<()>;
+    async fn cancel(self: Box<Self>) -> Option<()>;
 }
