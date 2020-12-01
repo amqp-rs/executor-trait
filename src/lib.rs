@@ -12,6 +12,9 @@ use core::{future::Future, ops::Deref, pin::Pin};
 /// A common interface for spawning futures and blocking tasks on top of an executor
 #[async_trait]
 pub trait Executor {
+    /// Block on a future until completion
+    fn block_on(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>);
+
     /// Spawn a future and return a handle to track its completion.
     ///
     /// Dropping the handle will cancel the future. You can call `detach()` to let it
@@ -33,6 +36,10 @@ impl<E: Deref + Sync> Executor for E
 where
     E::Target: Executor + Sync,
 {
+    fn block_on(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) {
+        self.deref().block_on(f)
+    }
+
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
         self.deref().spawn(f)
     }
