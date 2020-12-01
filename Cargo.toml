@@ -1,6 +1,6 @@
 [package]
 name = "executor-trait"
-version = "0.8.0"
+version = "0.9.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "A collection of traits to define a common interface across executors"
 edition = "2018"
