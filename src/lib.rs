@@ -13,7 +13,7 @@ use core::{future::Future, ops::Deref, pin::Pin};
 #[async_trait]
 pub trait Executor {
     /// Block on a future until completion
-    fn block_on(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>);
+    fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>);
 
     /// Spawn a future and return a handle to track its completion.
     ///
@@ -36,7 +36,7 @@ impl<E: Deref + Sync> Executor for E
 where
     E::Target: Executor + Sync,
 {
-    fn block_on(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) {
+    fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         self.deref().block_on(f)
     }
 
