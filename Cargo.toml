@@ -14,3 +14,6 @@ readme = "README.md"
 
 [dependencies]
 async-trait = "^0.1.42"
+
+[workspace]
+members = [".", "async-global-executor-trait"]
