@@ -1,0 +1,29 @@
+[package]
+name = "async-global-executor-trait"
+version = "1.0.0"
+authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
+description =  "executor-trait implementation for async-global-executor"
+edition = "2018"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/Keruspe/executor-trait"
+homepage = "https://github.com/Keruspe/executor-trait"
+documentation = "https://docs.rs/async-global-executor-trait"
+keywords = ["async", "await", "future", "executor"]
+categories = ["asynchronous", "concurrency"]
+readme = "README.md"
+
+[features]
+default = ["async-global-executor/default"]
+async-io = ["async-global-executor/async-io"]
+tokio = ["async-global-executor/tokio"]
+
+[dependencies]
+async-trait = "^0.1.42"
+
+[dependencies.async-global-executor]
+version = "^2.0"
+default-features = false
+
+[dependencies.executor-trait]
+version = "^1.0"
+path = ".."
