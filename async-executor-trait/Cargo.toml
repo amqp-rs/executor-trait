@@ -1,0 +1,29 @@
+[package]
+name = "async-executor-trait"
+version = "1.0.0"
+authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
+description =  "executor-trait implementation for async-std"
+edition = "2018"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/Keruspe/executor-trait"
+homepage = "https://github.com/Keruspe/executor-trait"
+documentation = "https://docs.rs/async-executor-trait"
+keywords = ["async", "await", "future", "executor"]
+categories = ["asynchronous", "concurrency"]
+readme = "README.md"
+
+[features]
+docs = ["async-std/docs"]
+attributes = ["async-std/attributes"]
+#tokio = ["async-std/tokio"]
+
+[dependencies]
+async-trait = "^0.1.42"
+
+[dependencies.async-std]
+version = "^1.8"
+features = ["default", "unstable"]
+
+[dependencies.executor-trait]
+version = "^1.0"
+path = ".."

@@ -16,4 +16,4 @@ readme = "README.md"
 async-trait = "^0.1.42"
 
 [workspace]
-members = [".", "async-global-executor-trait"]
+members = [".", "async-global-executor-trait", "async-executor-trait"]
