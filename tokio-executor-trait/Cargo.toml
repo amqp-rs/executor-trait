@@ -1,13 +1,13 @@
 [package]
-name = "executor-trait"
-version = "1.0.1"
+name = "tokio-executor-trait"
+version = "1.0.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
-description =  "A collection of traits to define a common interface across executors"
+description =  "executor-trait implementation for tokio"
 edition = "2018"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/Keruspe/executor-trait"
 homepage = "https://github.com/Keruspe/executor-trait"
-documentation = "https://docs.rs/executor-trait"
+documentation = "https://docs.rs/tokio-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
@@ -15,5 +15,10 @@ readme = "README.md"
 [dependencies]
 async-trait = "^0.1.42"
 
-[workspace]
-members = [".", "async-global-executor-trait", "async-executor-trait", "tokio-executor-trait"]
+[dependencies.tokio]
+version = "^1.0"
+features = ["rt-multi-thread"]
+
+[dependencies.executor-trait]
+version = "^1.0"
+path = ".."
