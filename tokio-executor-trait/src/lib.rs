@@ -1,11 +1,11 @@
 use async_trait::async_trait;
 use executor_trait::{Executor, Task};
-use tokio::runtime::Handle;
 use std::{
     future::Future,
     pin::Pin,
     task::{Context, Poll},
 };
+use tokio::runtime::Handle;
 
 /// Dummy object implementing executor-trait common interfaces on top of tokio
 #[derive(Debug, Default, Clone)]
@@ -24,7 +24,9 @@ struct TTask(tokio::task::JoinHandle<()>);
 impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         // FIXME: use the current runtime once Handle::block_on gets available
-        tokio::runtime::Runtime::new().expect("failed to create runtime").block_on(f);
+        tokio::runtime::Runtime::new()
+            .expect("failed to create runtime")
+            .block_on(f);
     }
 
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
@@ -45,7 +47,8 @@ impl Executor for Tokio {
             handle.spawn_blocking(f).await
         } else {
             tokio::task::spawn_blocking(f).await
-        }.expect("blocking task failed");
+        }
+        .expect("blocking task failed");
     }
 }
 
