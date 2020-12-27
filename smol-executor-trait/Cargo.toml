@@ -1,19 +1,22 @@
 [package]
-name = "executor-trait"
-version = "1.0.1"
+name = "smol-executor-trait"
+version = "1.0.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
-description =  "A collection of traits to define a common interface across executors"
+description =  "executor-trait implementation for smol"
 edition = "2018"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/Keruspe/executor-trait"
 homepage = "https://github.com/Keruspe/executor-trait"
-documentation = "https://docs.rs/executor-trait"
+documentation = "https://docs.rs/smol-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
 
 [dependencies]
 async-trait = "^0.1.42"
+blocking = "^1.0"
+smol = "^1.0"
 
-[workspace]
-members = [".", "async-global-executor-trait", "async-executor-trait", "bastion-executor-trait", "tokio-executor-trait", "smol-executor-trait"]
+[dependencies.executor-trait]
+version = "^1.0"
+path = ".."
