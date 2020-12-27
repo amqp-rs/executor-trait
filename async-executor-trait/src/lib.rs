@@ -6,7 +6,7 @@ use std::{
     task::{Context, Poll},
 };
 
-/// Dummy object implementing executor-trait common interfaces on top of async-global-executor
+/// Dummy object implementing executor-trait common interfaces on top of async-std
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AsyncStd;
 

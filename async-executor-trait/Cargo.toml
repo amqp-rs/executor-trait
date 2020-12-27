@@ -1,6 +1,6 @@
 [package]
 name = "async-executor-trait"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for async-std"
 edition = "2018"
