@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use executor_trait::{Executor, Task};
+use tokio::runtime::Handle;
 use std::{
     future::Future,
     pin::Pin,
@@ -7,8 +8,15 @@ use std::{
 };
 
 /// Dummy object implementing executor-trait common interfaces on top of tokio
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Tokio;
+#[derive(Debug, Default, Clone)]
+pub struct Tokio(Option<Handle>);
+
+impl Tokio {
+    pub fn with_handle(mut self, handle: Handle) -> Self {
+        self.0 = Some(handle);
+        self
+    }
+}
 
 struct TTask(tokio::task::JoinHandle<()>);
 
@@ -20,7 +28,11 @@ impl Executor for Tokio {
     }
 
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
-        Box::new(TTask(tokio::task::spawn(f)))
+        Box::new(TTask(if let Some(handle) = self.0.as_ref() {
+            handle.spawn(f)
+        } else {
+            tokio::task::spawn(f)
+        }))
     }
 
     fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
@@ -29,7 +41,11 @@ impl Executor for Tokio {
 
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         // FIXME: better handling of failure
-        tokio::task::spawn_blocking(f).await.expect("blocking task failed");
+        if let Some(handle) = self.0.as_ref() {
+            handle.spawn_blocking(f).await
+        } else {
+            tokio::task::spawn_blocking(f).await
+        }.expect("blocking task failed");
     }
 }
 
