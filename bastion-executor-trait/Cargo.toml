@@ -1,19 +1,22 @@
 [package]
-name = "executor-trait"
-version = "1.0.1"
+name = "bastion-executor-trait"
+version = "0.4.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
-description =  "A collection of traits to define a common interface across executors"
+description =  "executor-trait implementation for bastion"
 edition = "2018"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/Keruspe/executor-trait"
 homepage = "https://github.com/Keruspe/executor-trait"
-documentation = "https://docs.rs/executor-trait"
+documentation = "https://docs.rs/bastion-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
 
 [dependencies]
 async-trait = "^0.1.42"
+bastion = "^0.4"
+lightproc = "^0.3"
 
-[workspace]
-members = [".", "async-global-executor-trait", "async-executor-trait", "bastion-executor-trait", "tokio-executor-trait"]
+[dependencies.executor-trait]
+version = "^1.0"
+path = ".."
