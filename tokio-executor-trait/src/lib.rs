@@ -16,6 +16,10 @@ impl Tokio {
         self.0 = Some(handle);
         self
     }
+
+    pub fn current() -> Self {
+        Self::default().with_handle(Handle::current())
+    }
 }
 
 struct TTask(tokio::task::JoinHandle<()>);
