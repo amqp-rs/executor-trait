@@ -12,11 +12,6 @@ keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
 
-[features]
-docs = ["async-std/docs"]
-attributes = ["async-std/attributes"]
-#tokio = ["async-std/tokio"]
-
 [dependencies]
 async-trait = "^0.1.42"
 
