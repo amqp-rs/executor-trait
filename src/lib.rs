@@ -16,15 +16,9 @@ pub trait Executor {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>);
 
     /// Spawn a future and return a handle to track its completion.
-    ///
-    /// Dropping the handle will cancel the future. You can call `detach()` to let it
-    /// run without waiting for its completion.
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task>;
 
     /// Spawn a non-Send future on the current thread and return a handle to track its completion.
-    ///
-    /// Dropping the handle will cancel the future. You can call `detach()` to let it
-    /// run without waiting for its completion.
     fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task>;
 
     /// Convert a blocking task into a future, spawning it on a decicated thread pool
@@ -56,9 +50,6 @@ where
 /// A common interface to wait for a Task completion, let it run n the background or cancel it.
 #[async_trait(?Send)]
 pub trait Task: Future<Output = ()> {
-    /// Let the task run in the background.
-    fn detach(self: Box<Self>);
-
     /// Cancels the task and waits for it to stop running.
     ///
     /// Returns the task's output if it was completed just before it got canceled, or None if it

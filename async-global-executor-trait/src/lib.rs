@@ -10,7 +10,7 @@ use std::{
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct AsyncGlobalExecutor;
 
-struct AGETask(async_global_executor::Task<()>);
+struct AGETask(Option<async_global_executor::Task<()>>);
 
 #[async_trait]
 impl Executor for AsyncGlobalExecutor {
@@ -19,11 +19,11 @@ impl Executor for AsyncGlobalExecutor {
     }
 
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
-        Box::new(AGETask(async_global_executor::spawn(f)))
+        Box::new(AGETask(Some(async_global_executor::spawn(f))))
     }
 
     fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
-        Box::new(AGETask(async_global_executor::spawn_local(f)))
+        Box::new(AGETask(Some(async_global_executor::spawn_local(f))))
     }
 
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
@@ -33,12 +33,16 @@ impl Executor for AsyncGlobalExecutor {
 
 #[async_trait(?Send)]
 impl Task for AGETask {
-    fn detach(self: Box<Self>) {
-        self.0.detach();
+    async fn cancel(mut self: Box<Self>) -> Option<()> {
+        self.0.take()?.cancel().await
     }
+}
 
-    async fn cancel(self: Box<Self>) -> Option<()> {
-        self.0.cancel().await
+impl Drop for AGETask {
+    fn drop(&mut self) {
+        if let Some(task) = self.0.take() {
+            task.detach();
+        }
     }
 }
 
@@ -46,6 +50,6 @@ impl Future for AGETask {
     type Output = ();
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        Pin::new(&mut self.0).poll(cx)
+        Pin::new(self.0.as_mut().unwrap()).poll(cx)
     }
 }
