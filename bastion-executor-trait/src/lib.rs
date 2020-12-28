@@ -46,7 +46,6 @@ impl Future for BTask {
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         match Pin::new(&mut self.0).poll(cx) {
             Poll::Pending => Poll::Pending,
-            // FIXME: better handling of canceled task
             Poll::Ready(res) => Poll::Ready(res.expect("task has been canceled")),
         }
     }
