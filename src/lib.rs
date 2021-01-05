@@ -7,7 +7,17 @@ extern crate alloc;
 
 use alloc::boxed::Box;
 use async_trait::async_trait;
-use core::{future::Future, ops::Deref, pin::Pin};
+use core::{fmt, future::Future, ops::Deref, pin::Pin};
+
+/// An error to notify that the current executor doesn't support spawning local tasks.
+/// Holds the task that we tried to spawn.
+pub struct LocalExecutorError(pub Pin<Box<dyn Future<Output = ()>>>);
+
+impl fmt::Debug for LocalExecutorError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("LocalExecutorError").field(&"Future").finish()
+    }
+}
 
 /// A common interface for spawning futures and blocking tasks on top of an executor
 #[async_trait]
@@ -19,7 +29,9 @@ pub trait Executor {
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task>;
 
     /// Spawn a non-Send future on the current thread and return a handle to track its completion.
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task>;
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+        Err(LocalExecutorError(f))
+    }
 
     /// Convert a blocking task into a future, spawning it on a decicated thread pool
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>);
@@ -38,7 +50,7 @@ where
         self.deref().spawn(f)
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
         self.deref().spawn_local(f)
     }
 
