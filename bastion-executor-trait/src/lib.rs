@@ -21,7 +21,10 @@ impl Executor for Bastion {
         Box::new(BTask(bastion::executor::spawn(f)))
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+    fn spawn_local(
+        &self,
+        f: Pin<Box<dyn Future<Output = ()>>>,
+    ) -> Result<Box<dyn Task>, LocalExecutorError> {
         Err(LocalExecutorError(f))
     }
 }

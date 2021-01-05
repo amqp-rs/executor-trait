@@ -21,8 +21,13 @@ impl Executor for AsyncGlobalExecutor {
         Box::new(AGETask(Some(async_global_executor::spawn(f))))
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
-        Ok(Box::new(AGETask(Some(async_global_executor::spawn_local(f)))))
+    fn spawn_local(
+        &self,
+        f: Pin<Box<dyn Future<Output = ()>>>,
+    ) -> Result<Box<dyn Task>, LocalExecutorError> {
+        Ok(Box::new(AGETask(Some(async_global_executor::spawn_local(
+            f,
+        )))))
     }
 }
 

@@ -21,7 +21,10 @@ impl Executor for AsyncStd {
         Box::new(ASTask(async_std::task::spawn(f)))
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+    fn spawn_local(
+        &self,
+        f: Pin<Box<dyn Future<Output = ()>>>,
+    ) -> Result<Box<dyn Task>, LocalExecutorError> {
         Ok(Box::new(ASTask(async_std::task::spawn_local(f))))
     }
 }

@@ -40,7 +40,10 @@ impl Executor for Tokio {
         }))
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+    fn spawn_local(
+        &self,
+        f: Pin<Box<dyn Future<Output = ()>>>,
+    ) -> Result<Box<dyn Task>, LocalExecutorError> {
         // FIXME: how can we hook up spawn_local here?
         Err(LocalExecutorError(f))
     }
