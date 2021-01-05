@@ -24,8 +24,6 @@ impl fmt::Debug for LocalExecutorError {
 /// A common interface for spawning futures and blocking tasks on top of an executor
 pub trait FullExecutor: Executor + BlockingExecutor {}
 
-impl<E: Executor + BlockingExecutor> FullExecutor for E {}
-
 /// A common interface for spawning futures on top of an executor
 pub trait Executor {
     /// Block on a future until completion
@@ -49,6 +47,8 @@ pub trait BlockingExecutor {
     /// Convert a blocking task into a future, spawning it on a decicated thread pool
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>);
 }
+
+impl<E: Deref + Sync> FullExecutor for E where E::Target: FullExecutor + Sync {}
 
 impl<E: Deref + Sync> Executor for E
 where

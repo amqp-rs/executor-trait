@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{BlockingExecutor, Executor, LocalExecutorError, Task};
+use executor_trait::{BlockingExecutor, Executor, FullExecutor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -11,6 +11,8 @@ use std::{
 pub struct Smol;
 
 struct STask(Option<smol::Task<()>>);
+
+impl FullExecutor for Smol {}
 
 impl Executor for Smol {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {

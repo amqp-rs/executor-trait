@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{BlockingExecutor, Executor, LocalExecutorError, Task};
+use executor_trait::{BlockingExecutor, Executor, FullExecutor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -11,6 +11,8 @@ use std::{
 pub struct Bastion;
 
 struct BTask(lightproc::recoverable_handle::RecoverableHandle<()>);
+
+impl FullExecutor for Bastion {}
 
 impl Executor for Bastion {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {

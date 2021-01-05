@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{BlockingExecutor, Executor, LocalExecutorError, Task};
+use executor_trait::{BlockingExecutor, Executor, FullExecutor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -23,6 +23,8 @@ impl Tokio {
 }
 
 struct TTask(tokio::task::JoinHandle<()>);
+
+impl FullExecutor for Tokio {}
 
 impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
