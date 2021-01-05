@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{Executor, Task};
+use executor_trait::{BlockingExecutor, Executor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -12,7 +12,6 @@ pub struct AsyncStd;
 
 struct ASTask(async_std::task::JoinHandle<()>);
 
-#[async_trait]
 impl Executor for AsyncStd {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         async_std::task::block_on(f);
@@ -22,10 +21,13 @@ impl Executor for AsyncStd {
         Box::new(ASTask(async_std::task::spawn(f)))
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
-        Box::new(ASTask(async_std::task::spawn_local(f)))
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+        Ok(Box::new(ASTask(async_std::task::spawn_local(f))))
     }
+}
 
+#[async_trait]
+impl BlockingExecutor for AsyncStd {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         async_std::task::spawn_blocking(f).await;
     }

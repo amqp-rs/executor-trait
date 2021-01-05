@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{Executor, Task};
+use executor_trait::{BlockingExecutor, Executor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -24,7 +24,6 @@ impl Tokio {
 
 struct TTask(tokio::task::JoinHandle<()>);
 
-#[async_trait]
 impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         // FIXME: use the current runtime once Handle::block_on gets available
@@ -41,10 +40,14 @@ impl Executor for Tokio {
         }))
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
-        Box::new(TTask(tokio::task::spawn_local(f)))
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+        // FIXME: how can we hook up spawn_local here?
+        Err(LocalExecutorError(f))
     }
+}
 
+#[async_trait]
+impl BlockingExecutor for Tokio {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         // FIXME: better handling of failure
         if let Some(handle) = self.0.as_ref() {

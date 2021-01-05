@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{Executor, Task};
+use executor_trait::{BlockingExecutor, Executor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -12,7 +12,6 @@ pub struct AsyncGlobalExecutor;
 
 struct AGETask(Option<async_global_executor::Task<()>>);
 
-#[async_trait]
 impl Executor for AsyncGlobalExecutor {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         async_global_executor::block_on(f);
@@ -22,10 +21,13 @@ impl Executor for AsyncGlobalExecutor {
         Box::new(AGETask(Some(async_global_executor::spawn(f))))
     }
 
-    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
-        Box::new(AGETask(Some(async_global_executor::spawn_local(f))))
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+        Ok(Box::new(AGETask(Some(async_global_executor::spawn_local(f)))))
     }
+}
 
+#[async_trait]
+impl BlockingExecutor for AsyncGlobalExecutor {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         async_global_executor::spawn_blocking(f).await;
     }

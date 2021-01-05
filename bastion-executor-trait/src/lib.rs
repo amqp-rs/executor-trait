@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{Executor, Task};
+use executor_trait::{BlockingExecutor, Executor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -12,7 +12,6 @@ pub struct Bastion;
 
 struct BTask(lightproc::recoverable_handle::RecoverableHandle<()>);
 
-#[async_trait]
 impl Executor for Bastion {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         bastion::run!(f);
@@ -22,11 +21,13 @@ impl Executor for Bastion {
         Box::new(BTask(bastion::executor::spawn(f)))
     }
 
-    fn spawn_local(&self, _f: Pin<Box<dyn Future<Output = ()>>>) -> Box<dyn Task> {
-        // FIXME
-        panic!("bastion doesn't seem to know how to spawn local futures");
+    fn spawn_local(&self, f: Pin<Box<dyn Future<Output = ()>>>) -> Result<Box<dyn Task>, LocalExecutorError> {
+        Err(LocalExecutorError(f))
     }
+}
 
+#[async_trait]
+impl BlockingExecutor for Bastion {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         bastion::executor::blocking(async move { f() }).await;
     }
