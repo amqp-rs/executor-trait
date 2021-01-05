@@ -1,6 +1,6 @@
 [package]
 name = "bastion-executor-trait"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for bastion"
 edition = "2018"
@@ -18,5 +18,5 @@ bastion = "^0.4"
 lightproc = "^0.3"
 
 [dependencies.executor-trait]
-version = "^1.0"
+version = "^2.0"
 path = ".."

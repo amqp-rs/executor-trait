@@ -1,6 +1,6 @@
 [package]
 name = "async-executor-trait"
-version = "1.0.2"
+version = "2.0.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for async-std"
 edition = "2018"
@@ -20,5 +20,5 @@ version = "^1.8"
 features = ["default", "unstable"]
 
 [dependencies.executor-trait]
-version = "^1.0"
+version = "^2.0"
 path = ".."
