@@ -1,7 +1,7 @@
 # async-executor-trait
 
 [![API Docs](https://docs.rs/async-executor-trait/badge.svg)](https://docs.rs/async-executor-trait)
-[![Build status](https://github.com/Keruspe/executor-trait/workflows/Build%20and%20test/badge.svg)](https://github.com/Keruspe/executor-trait/actions)
+[![Build status](https://github.com/amqp-rs/executor-trait/workflows/Build%20and%20test/badge.svg)](https://github.com/amqp-rs/executor-trait/actions)
 [![Downloads](https://img.shields.io/crates/d/async-executor-trait.svg)](https://crates.io/crates/async-executor-trait)
 
 executor-trait implementation for async-std

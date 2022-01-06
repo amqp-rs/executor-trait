@@ -5,8 +5,8 @@ authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for async-std"
 edition = "2018"
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/Keruspe/executor-trait"
-homepage = "https://github.com/Keruspe/executor-trait"
+repository = "https://github.com/amqp-rs/executor-trait"
+homepage = "https://github.com/amqp-rs/executor-trait"
 documentation = "https://docs.rs/async-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
@@ -22,3 +22,6 @@ features = ["default", "unstable"]
 [dependencies.executor-trait]
 version = "^2.0"
 path = ".."
+
+[badges]
+maintenance = { status = "actively-developed" }
