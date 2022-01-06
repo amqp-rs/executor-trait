@@ -1,6 +1,6 @@
 [package]
 name = "bastion-executor-trait"
-version = "0.5.1"
+version = "0.5.2"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for bastion"
 edition = "2018"
