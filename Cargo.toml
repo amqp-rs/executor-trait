@@ -3,7 +3,7 @@ name = "executor-trait"
 version = "2.0.2"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "A collection of traits to define a common interface across executors"
-edition = "2018"
+edition = "2021"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/amqp-rs/executor-trait"
 homepage = "https://github.com/amqp-rs/executor-trait"
@@ -11,6 +11,7 @@ documentation = "https://docs.rs/executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
+rust-version = "1.56.0"
 
 [dependencies]
 async-trait = "^0.1.42"
