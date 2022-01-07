@@ -1,6 +1,6 @@
 [package]
 name = "smol-executor-trait"
-version = "2.0.2"
+version = "2.1.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for smol"
 edition = "2021"
@@ -19,7 +19,7 @@ blocking = "^1.0"
 smol = "^1.0"
 
 [dependencies.executor-trait]
-version = "^2.0"
+version = "^2.1"
 path = ".."
 
 [badges]

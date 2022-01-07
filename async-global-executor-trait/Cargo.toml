@@ -1,6 +1,6 @@
 [package]
 name = "async-global-executor-trait"
-version = "2.0.2"
+version = "2.1.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for async-global-executor"
 edition = "2021"
@@ -26,7 +26,7 @@ version = "^2.0"
 default-features = false
 
 [dependencies.executor-trait]
-version = "^2.0"
+version = "^2.1"
 path = ".."
 
 [badges]
