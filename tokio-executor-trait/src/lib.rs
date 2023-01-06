@@ -28,10 +28,7 @@ impl FullExecutor for Tokio {}
 
 impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
-        // FIXME: use the current runtime once Handle::block_on gets available
-        tokio::runtime::Runtime::new()
-            .expect("failed to create runtime")
-            .block_on(f);
+        tokio::runtime::Handle::current().block_on(f);
     }
 
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
