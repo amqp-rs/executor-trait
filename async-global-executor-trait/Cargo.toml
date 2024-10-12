@@ -1,6 +1,6 @@
 [package]
 name = "async-global-executor-trait"
-version = "2.1.0"
+version = "2.1.1"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for async-global-executor"
 edition = "2021"
@@ -11,7 +11,7 @@ documentation = "https://docs.rs/async-global-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
-rust-version = "1.56.0"
+rust-version = "1.63.0"
 
 [features]
 default = ["async-global-executor/default"]
