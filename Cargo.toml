@@ -1,6 +1,6 @@
 [package]
 name = "executor-trait"
-version = "2.1.1"
+version = "2.1.2"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "A collection of traits to define a common interface across executors"
 edition = "2021"
@@ -11,7 +11,7 @@ documentation = "https://docs.rs/executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
-rust-version = "1.63.0"
+rust-version = "1.70.0"
 
 [dependencies]
 async-trait = "^0.1.42"

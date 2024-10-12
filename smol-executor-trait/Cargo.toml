@@ -1,6 +1,6 @@
 [package]
 name = "smol-executor-trait"
-version = "3.0.1"
+version = "3.0.2"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for smol"
 edition = "2021"
@@ -11,7 +11,7 @@ documentation = "https://docs.rs/smol-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
-rust-version = "1.63.0"
+rust-version = "1.70.0"
 
 [dependencies]
 async-trait = "^0.1.42"
