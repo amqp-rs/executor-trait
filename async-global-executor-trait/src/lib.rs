@@ -59,6 +59,6 @@ impl Future for AGETask {
     type Output = ();
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
-        Pin::new(self.0.as_mut().unwrap()).poll(cx)
+        self.0.as_mut().map_or(Poll::Ready(()), |handle| Pin::new(handle).poll(cx))
     }
 }
