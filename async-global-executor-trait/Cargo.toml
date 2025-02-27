@@ -11,7 +11,7 @@ documentation = "https://docs.rs/async-global-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
-rust-version = "1.70.0"
+rust-version = "1.80.0"
 
 [features]
 default = ["async-global-executor/default"]
@@ -22,7 +22,7 @@ tokio = ["async-global-executor/tokio"]
 async-trait = "^0.1.42"
 
 [dependencies.async-global-executor]
-version = "^2.0"
+version = "^3.1"
 default-features = false
 
 [dependencies.executor-trait]
