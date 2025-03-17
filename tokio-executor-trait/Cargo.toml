@@ -11,7 +11,7 @@ documentation = "https://docs.rs/tokio-executor-trait"
 keywords = ["async", "await", "future", "executor"]
 categories = ["asynchronous", "concurrency"]
 readme = "README.md"
-rust-version = "1.70.0"
+rust-version = "1.80.0"
 
 [dependencies]
 async-trait = "^0.1.42"
