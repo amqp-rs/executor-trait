@@ -7,18 +7,49 @@ use std::{
 };
 use tokio::runtime::Handle;
 
+#[cfg(feature = "tracing")]
+use {tracing::Span, tracing_futures::Instrument};
+
 /// Dummy object implementing executor-trait common interfaces on top of tokio
-#[derive(Debug, Default, Clone)]
-pub struct Tokio(Option<Handle>);
+#[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "tracing"), derive(Default))]
+pub struct Tokio {
+    handle: Option<Handle>,
+    #[cfg(feature = "tracing")]
+    span: Span,
+}
+
+#[cfg(feature = "tracing")]
+impl Default for Tokio {
+    fn default() -> Self {
+        Self {
+            handle: None,
+            span: Span::none(),
+        }
+    }
+}
 
 impl Tokio {
     pub fn with_handle(mut self, handle: Handle) -> Self {
-        self.0 = Some(handle);
+        self.handle = Some(handle);
         self
     }
 
     pub fn current() -> Self {
         Self::default().with_handle(Handle::current())
+    }
+}
+
+#[cfg(feature = "tracing")]
+impl Tokio {
+    pub fn with_span(mut self, span: Span) -> Self {
+        self.span = span;
+        self
+    }
+
+    pub fn with_current_span(mut self) -> Self {
+        self.span = Span::current();
+        self
     }
 }
 
@@ -28,11 +59,15 @@ impl FullExecutor for Tokio {}
 
 impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
-        tokio::runtime::Handle::current().block_on(f);
+        #[cfg(feature = "tracing")]
+        let f = f.instrument(self.span.clone());
+        Handle::current().block_on(f);
     }
 
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
-        Box::new(TTask(if let Some(handle) = self.0.as_ref() {
+        #[cfg(feature = "tracing")]
+        let f = f.instrument(self.span.clone());
+        Box::new(TTask(if let Some(handle) = self.handle.as_ref() {
             handle.spawn(f)
         } else {
             tokio::task::spawn(f)
@@ -51,8 +86,16 @@ impl Executor for Tokio {
 #[async_trait]
 impl BlockingExecutor for Tokio {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
+        #[cfg(feature = "tracing")]
+        let f = {
+            let span = self.span.clone();
+            move || {
+                let _entered = span.enter();
+                f()
+            }
+        };
         // FIXME: better handling of failure
-        if let Some(handle) = self.0.as_ref() {
+        if let Some(handle) = self.handle.as_ref() {
             handle.spawn_blocking(f).await
         } else {
             tokio::task::spawn_blocking(f).await
