@@ -38,6 +38,10 @@ impl Tokio {
     pub fn current() -> Self {
         Self::default().with_handle(Handle::current())
     }
+
+    pub(crate) fn handle(&self) -> Option<Handle> {
+        Handle::try_current().or_else(|| self.0.clone())
+    }
 }
 
 #[cfg(feature = "tracing")]
@@ -60,13 +64,17 @@ impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         #[cfg(feature = "tracing")]
         let f = f.instrument(self.span.clone());
-        Handle::current().block_on(f);
+        if let Some(handle) = self.handle() {
+            handle.block_on(f)
+        } else {
+            Handle::current().block_on(f);
+        }
     }
 
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
         #[cfg(feature = "tracing")]
         let f = f.instrument(self.span.clone());
-        Box::new(TTask(if let Some(handle) = self.handle.as_ref() {
+        Box::new(TTask(if let Some(handle) = self.handle() {
             handle.spawn(f)
         } else {
             tokio::task::spawn(f)
@@ -91,7 +99,7 @@ impl Executor for Tokio {
             }
         };
         // FIXME: better handling of failure
-        if let Some(handle) = self.handle.as_ref() {
+        if let Some(handle) = self.handle() {
             handle.spawn_blocking(f).await
         } else {
             tokio::task::spawn_blocking(f).await
