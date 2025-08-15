@@ -8,11 +8,9 @@ A collection of traits to define a common interface across executors
 
 ## Available implementations
 
-- [async-std](https://crates.io/crates/async-executor-trait)
 - [tokio](https://crates.io/crates/tokio-executor-trait)
 - [smol](https://crates.io/crates/smol-executor-trait)
 - [async-global-executor](https://crates.io/crates/async-global-executor-trait)
-- [bastion](https://crates.io/crates/bastion-executor-trait)
 
 ## License
 
