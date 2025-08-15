@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{BlockingExecutor, Executor, FullExecutor, LocalExecutorError, Task};
+use executor_trait::{Executor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
@@ -40,7 +40,7 @@ impl Tokio {
     }
 
     pub(crate) fn handle(&self) -> Option<Handle> {
-        Handle::try_current().or_else(|| self.0.clone())
+        Handle::try_current().ok().or_else(|| self.handle.clone())
     }
 }
 

@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use executor_trait::{BlockingExecutor, Executor, FullExecutor, LocalExecutorError, Task};
+use executor_trait::{Executor, LocalExecutorError, Task};
 use std::{
     future::Future,
     pin::Pin,
