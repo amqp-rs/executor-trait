@@ -55,8 +55,7 @@ impl Tokio {
 
 struct TTask(tokio::task::JoinHandle<()>);
 
-impl FullExecutor for Tokio {}
-
+#[async_trait]
 impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         #[cfg(feature = "tracing")]
@@ -81,10 +80,7 @@ impl Executor for Tokio {
         // FIXME: how can we hook up spawn_local here?
         Err(LocalExecutorError(f))
     }
-}
 
-#[async_trait]
-impl BlockingExecutor for Tokio {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         #[cfg(feature = "tracing")]
         let f = {

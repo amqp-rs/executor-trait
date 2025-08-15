@@ -12,8 +12,7 @@ pub struct Smol;
 
 struct STask(Option<smol::Task<()>>);
 
-impl FullExecutor for Smol {}
-
+#[async_trait]
 impl Executor for Smol {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         smol::block_on(f);
@@ -29,10 +28,7 @@ impl Executor for Smol {
     ) -> Result<Box<dyn Task>, LocalExecutorError> {
         Err(LocalExecutorError(f))
     }
-}
 
-#[async_trait]
-impl BlockingExecutor for Smol {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         smol::unblock(f).await;
     }

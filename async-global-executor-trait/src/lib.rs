@@ -12,8 +12,7 @@ pub struct AsyncGlobalExecutor;
 
 struct AGETask(Option<async_global_executor::Task<()>>);
 
-impl FullExecutor for AsyncGlobalExecutor {}
-
+#[async_trait]
 impl Executor for AsyncGlobalExecutor {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         async_global_executor::block_on(f);
@@ -31,10 +30,7 @@ impl Executor for AsyncGlobalExecutor {
             f,
         )))))
     }
-}
 
-#[async_trait]
-impl BlockingExecutor for AsyncGlobalExecutor {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         async_global_executor::spawn_blocking(f).await;
     }
