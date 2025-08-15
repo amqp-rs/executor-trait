@@ -17,7 +17,7 @@ rust-version = "1.80.0"
 async-trait = "^0.1.42"
 
 [workspace]
-members = [".", "async-global-executor-trait", "async-executor-trait", "tokio-executor-trait", "smol-executor-trait"]
+members = [".", "async-global-executor-trait", "tokio-executor-trait", "smol-executor-trait"]
 
 [badges]
 maintenance = { status = "actively-developed" }
