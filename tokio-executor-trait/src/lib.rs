@@ -55,6 +55,10 @@ impl Tokio {
         self.span = Span::current();
         self
     }
+
+    pub fn span(&self) -> Span {
+        self.span.clone()
+    }
 }
 
 struct TTask(tokio::task::JoinHandle<()>);
@@ -130,6 +134,21 @@ impl Future for TTask {
                 res.expect("task has been canceled");
                 Poll::Ready(())
             }
+        }
+    }
+}
+
+// Tell the compiler we won't impl Deref<Target=tokio_executor_trait_3::Tokio>
+mod sealed {
+    use std::ops::Deref;
+
+    pub struct Dummy;
+
+    impl Deref for super::Tokio {
+        type Target = Dummy;
+
+        fn deref(&self) -> &Self::Target {
+            &Dummy
         }
     }
 }
