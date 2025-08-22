@@ -140,15 +140,15 @@ impl Future for TTask {
 
 // Tell the compiler we won't impl Deref<Target=tokio_executor_trait_3::Tokio>
 mod sealed {
-    use std::ops::Deref;
+    use std::{marker::PhantomData, ops::Deref};
 
-    pub struct Dummy;
+    pub struct Dummy(PhantomData<*const ()>);
 
     impl Deref for super::Tokio {
         type Target = Dummy;
 
         fn deref(&self) -> &Self::Target {
-            &Dummy
+            &Dummy(PhantomData)
         }
     }
 }

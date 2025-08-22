@@ -540,7 +540,7 @@ dependencies = [
 
 [[package]]
 name = "tokio-executor-trait"
-version = "2.3.0"
+version = "2.4.0"
 dependencies = [
  "async-trait",
  "executor-trait",
