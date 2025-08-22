@@ -6,54 +6,48 @@ use std::{
     task::{Context, Poll},
 };
 use tokio::runtime::Handle;
+use tokio_executor_trait_2::Tokio as OldTokio;
 
 #[cfg(feature = "tracing")]
 use {tracing::Span, tracing_futures::Instrument};
 
 /// Dummy object implementing executor-trait common interfaces on top of tokio
-#[derive(Debug, Clone)]
-#[cfg_attr(not(feature = "tracing"), derive(Default))]
+#[derive(Default, Debug, Clone)]
 pub struct Tokio {
-    handle: Option<Handle>,
-    #[cfg(feature = "tracing")]
-    span: Span,
-}
-
-#[cfg(feature = "tracing")]
-impl Default for Tokio {
-    fn default() -> Self {
-        Self {
-            handle: None,
-            span: Span::none(),
-        }
-    }
+    inner: OldTokio,
 }
 
 impl Tokio {
     pub fn with_handle(mut self, handle: Handle) -> Self {
-        self.handle = Some(handle);
+        self.inner = self.inner.with_handle(handle);
         self
     }
 
     pub fn current() -> Self {
-        Self::default().with_handle(Handle::current())
+        Self {
+            inner: OldTokio::current(),
+        }
     }
 
-    pub(crate) fn handle(&self) -> Option<Handle> {
-        Handle::try_current().ok().or_else(|| self.handle.clone())
+    pub fn handle(&self) -> Option<Handle> {
+        self.inner.handle()
     }
 }
 
 #[cfg(feature = "tracing")]
 impl Tokio {
     pub fn with_span(mut self, span: Span) -> Self {
-        self.span = span;
+        self.inner = self.inner.with_span(span);
         self
     }
 
     pub fn with_current_span(mut self) -> Self {
-        self.span = Span::current();
+        self.inner = self.inner.with_current_span();
         self
+    }
+
+    pub fn span(&self) -> Span {
+        self.inner.span()
     }
 }
 
@@ -63,7 +57,7 @@ struct TTask(tokio::task::JoinHandle<()>);
 impl Executor for Tokio {
     fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
         #[cfg(feature = "tracing")]
-        let f = f.instrument(self.span.clone());
+        let f = f.instrument(self.span());
         if let Some(handle) = self.handle() {
             handle.block_on(f)
         } else {
@@ -73,7 +67,7 @@ impl Executor for Tokio {
 
     fn spawn(&self, f: Pin<Box<dyn Future<Output = ()> + Send>>) -> Box<dyn Task> {
         #[cfg(feature = "tracing")]
-        let f = f.instrument(self.span.clone());
+        let f = f.instrument(self.span());
         Box::new(TTask(if let Some(handle) = self.handle() {
             handle.spawn(f)
         } else {
@@ -92,7 +86,7 @@ impl Executor for Tokio {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
         #[cfg(feature = "tracing")]
         let f = {
-            let span = self.span.clone();
+            let span = self.span();
             move || {
                 let _entered = span.enter();
                 f()
@@ -127,5 +121,34 @@ impl Future for TTask {
                 Poll::Ready(())
             }
         }
+    }
+}
+
+impl executor_trait_2::FullExecutor for Tokio {}
+
+impl executor_trait_2::Executor for Tokio {
+    fn block_on(&self, f: Pin<Box<dyn Future<Output = ()>>>) {
+        self.inner.block_on(f)
+    }
+
+    fn spawn(
+        &self,
+        f: Pin<Box<dyn Future<Output = ()> + Send>>,
+    ) -> Box<dyn executor_trait_2::Task> {
+        self.inner.spawn(f)
+    }
+
+    fn spawn_local(
+        &self,
+        f: Pin<Box<dyn Future<Output = ()>>>,
+    ) -> Result<Box<dyn executor_trait_2::Task>, executor_trait_2::LocalExecutorError> {
+        self.inner.spawn_local(f)
+    }
+}
+
+#[async_trait]
+impl executor_trait_2::BlockingExecutor for Tokio {
+    async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
+        self.inner.spawn_blocking(f).await
     }
 }

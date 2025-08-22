@@ -1,6 +1,6 @@
 [package]
 name = "smol-executor-trait"
-version = "4.0.0"
+version = "4.1.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for smol"
 edition = "2024"
@@ -22,5 +22,13 @@ smol = "^2.0"
 version = "^3.0"
 path = ".."
 
+[dependencies.executor-trait-2]
+package = "executor-trait"
+version = "^2.1"
+
+[dependencies.smol-executor-trait-3]
+package = "smol-executor-trait"
+version = "^3.0"
+
 [badges]
-maintenance = { status = "actively-developed" }
+maintenance = { status = "passively-developed" } # use async-rs instead

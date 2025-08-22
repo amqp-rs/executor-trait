@@ -1,6 +1,6 @@
 [package]
 name = "tokio-executor-trait"
-version = "3.0.0"
+version = "3.1.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for tokio"
 edition = "2024"
@@ -14,7 +14,7 @@ readme = "README.md"
 rust-version = "1.85.0"
 
 [features]
-tracing = ["dep:tracing", "dep:tracing-futures"]
+tracing = ["dep:tracing", "dep:tracing-futures", "tokio-executor-trait-2/tracing"]
 
 [dependencies]
 async-trait = "^0.1.42"
@@ -23,10 +23,18 @@ async-trait = "^0.1.42"
 version = "^3.0"
 path = ".."
 
+[dependencies.executor-trait-2]
+package = "executor-trait"
+version = "^2.1"
+
 [dependencies.tokio]
 version = "^1.4"
 default-features = false
 features = ["rt-multi-thread"]
+
+[dependencies.tokio-executor-trait-2]
+package = "tokio-executor-trait"
+version = "^2.3"
 
 [dependencies.tracing]
 version = "^0.1"
@@ -37,4 +45,4 @@ version = "^0.2"
 optional = true
 
 [badges]
-maintenance = { status = "actively-developed" }
+maintenance = { status = "passively-developed" } # use async-rs instead

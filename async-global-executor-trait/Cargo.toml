@@ -1,6 +1,6 @@
 [package]
 name = "async-global-executor-trait"
-version = "3.0.0"
+version = "3.1.0"
 authors = ["Marc-Antoine Perennou <Marc-Antoine@Perennou.com>"]
 description =  "executor-trait implementation for async-global-executor"
 edition = "2024"
@@ -25,9 +25,17 @@ async-trait = "^0.1.42"
 version = "^3.1"
 default-features = false
 
+[dependencies.async-global-executor-trait-2]
+package = "async-global-executor-trait"
+version = "^2.2"
+
 [dependencies.executor-trait]
 version = "^3.0"
 path = ".."
 
+[dependencies.executor-trait-2]
+package = "executor-trait"
+version = "^2.1"
+
 [badges]
-maintenance = { status = "actively-developed" }
+maintenance = { status = "passively-developed" } # use async-rs instead
