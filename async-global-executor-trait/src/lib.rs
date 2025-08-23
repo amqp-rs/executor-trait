@@ -86,6 +86,8 @@ impl executor_trait_2::Executor for AsyncGlobalExecutor {
 #[async_trait]
 impl executor_trait_2::BlockingExecutor for AsyncGlobalExecutor {
     async fn spawn_blocking(&self, f: Box<dyn FnOnce() + Send + 'static>) {
-        async_global_executor_trait_2::AsyncGlobalExecutor.spawn_blocking(f).await
+        async_global_executor_trait_2::AsyncGlobalExecutor
+            .spawn_blocking(f)
+            .await
     }
 }
